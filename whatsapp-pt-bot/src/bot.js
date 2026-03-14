@@ -130,7 +130,10 @@ async function startBot() {
         }
 
         const conv = getConversation(phone);
-        const explicitChoice = parseMenuChoice(text);
+        const explicitChoiceRaw = parseMenuChoice(text);
+        const explicitChoice = ['1', '2', '3', '4', '5', '6'].includes(explicitChoiceRaw)
+          ? explicitChoiceRaw
+          : null;
         const inferredChoice = inferMenuChoiceFromText(text);
         const choice = explicitChoice || inferredChoice;
 
