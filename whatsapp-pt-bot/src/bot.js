@@ -42,6 +42,20 @@ function toJid(phone) {
   return `${phone}@s.whatsapp.net`;
 }
 
+function inferMenuChoiceFromText(text = '') {
+  const t = text.toLowerCase().trim();
+
+  if (['menu', 'menù', 'help', 'aiuto'].includes(t)) return 'MENU';
+  if (t.includes('prenot')) return '1';
+  if (t.includes('recuper')) return '2';
+  if (t.includes('appuntament') && (t.includes('ved') || t.includes('mostra') || t.includes('prossim'))) return '3';
+  if (t.includes('disdici') || t.includes('annulla')) return '4';
+  if (t.includes('coach') || t.includes('operatore')) return '5';
+  if (t.includes('prezz') || t.includes('costo') || t.includes('info')) return '6';
+
+  return null;
+}
+
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState('./auth_info_baileys');
   const { version } = await fetchLatestBaileysVersion();
@@ -116,7 +130,14 @@ async function startBot() {
         }
 
         const conv = getConversation(phone);
-        const choice = parseMenuChoice(text);
+        const explicitChoice = parseMenuChoice(text);
+        const inferredChoice = inferMenuChoiceFromText(text);
+        const choice = explicitChoice || inferredChoice;
+
+        if (choice === 'MENU') {
+          await sock.sendMessage(jid, { text: mainMenu(process.env.PT_NAME) });
+          continue;
+        }
 
         if (conv.state === 'BOOKING_TYPE') {
           await handleBookingType(phone, text, sock.sendMessage.bind(sock), jid);
@@ -159,12 +180,16 @@ async function startBot() {
         }
 
         if (choice === '5') {
-          await sock.sendMessage(jid, { text: `Ti metto in contatto con il coach ${process.env.PT_NAME}. Ti risponderà appena possibile 💬` });
+          await sock.sendMessage(jid, {
+            text: `Ti metto in contatto con il coach ${process.env.PT_NAME}. Ti risponderà appena possibile 💬\n\nSe vuoi, puoi continuare ad usare il menu scrivendo 1-6 oppure "menu".`
+          });
           continue;
         }
 
         if (choice === '6') {
-          await sock.sendMessage(jid, { text: 'Per info e prezzi ti consiglio di scrivere direttamente al coach. Non posso inventare listini o promozioni 🙌' });
+          await sock.sendMessage(jid, {
+            text: 'Per info e prezzi ti consiglio di scrivere direttamente al coach. Non posso inventare listini o promozioni 🙌\n\nVuoi prenotare ora? Scrivi 1 oppure "prenotare".'
+          });
           continue;
         }
 
