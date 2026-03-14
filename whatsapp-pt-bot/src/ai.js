@@ -2,7 +2,19 @@
 const OpenAI = require('openai');
 const { getRecentMessages, saveMessage } = require('./database');
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let openaiClient = null;
+
+function getOpenAIClient() {
+  if (openaiClient) return openaiClient;
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY mancante nel file .env');
+  }
+
+  openaiClient = new OpenAI({ apiKey });
+  return openaiClient;
+}
 
 function buildSystemPrompt() {
   return `Sei l'assistente virtuale di ${process.env.PT_NAME}, un personal trainer professionale.
@@ -13,6 +25,8 @@ Non inventare prezzi o disponibilità.`;
 }
 
 async function generateAIReply(phone, userMessage) {
+  const client = getOpenAIClient();
+
   saveMessage(phone, 'user', userMessage);
   const history = getRecentMessages(phone, 5);
 
@@ -34,6 +48,8 @@ async function generateAIReply(phone, userMessage) {
 }
 
 async function generatePreWorkoutTip(sessionType) {
+  const client = getOpenAIClient();
+
   const res = await client.chat.completions.create({
     model: 'gpt-4o-mini',
     temperature: 0.7,

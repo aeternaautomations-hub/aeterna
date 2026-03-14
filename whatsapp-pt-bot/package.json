@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node --max-old-space-size=512 src/index.js",
     "dev": "NODE_ENV=development node --max-old-space-size=512 src/index.js",
-    "lint": "node --check src/index.js && node --check src/bot.js && node --check src/scheduler.js"
+    "lint": "node scripts/validate-syntax.js",
+    "test": "npm run lint"
   },
   "engines": {
     "node": ">=18"

@@ -1,12 +1,13 @@
 // src/index.js
-const http = require('http');
 const dotenv = require('dotenv');
+
+dotenv.config();
+
+const http = require('http');
 const { startBot } = require('./bot');
 const { initDatabase } = require('./database');
 const { createScheduler } = require('./scheduler');
 const { log } = require('./utils/helpers');
-
-dotenv.config();
 
 function validateEnv() {
   const required = [
