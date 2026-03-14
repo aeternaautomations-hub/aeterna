@@ -5,6 +5,8 @@ function mainMenu(ptName) {
   return `Ciao! 💪 Sono l'assistente virtuale di ${ptName}.
 Come posso aiutarti?
 
+ℹ️ Il menu non è cliccabile: rispondi con il numero (1-6) oppure con parole come "prenotare", "appuntamenti", "disdire", "coach".
+
 1️⃣ Prenota una sessione
 2️⃣ Recupera una sessione saltata
 3️⃣ Vedi i tuoi appuntamenti
